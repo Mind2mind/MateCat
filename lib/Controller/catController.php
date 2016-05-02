@@ -54,6 +54,12 @@ class catController extends viewController {
     private $project ;
 
     /**
+     * @var FeatureSet
+     */
+
+    private $feature_set ;
+
+    /**
      * @var string
      */
     private $thisUrl;
@@ -144,7 +150,6 @@ class catController extends viewController {
      */
     private function findJobByIdAndPassword() {
         if ( self::isRevision() ) {
-            $this->project = Projects_ProjectDao::findByJobId( $this->jid );
 
             $this->password = Features::filter(
                 'filter_review_password_to_job_password',
@@ -161,6 +166,8 @@ class catController extends viewController {
     public function doAction() {
         $files_found  = array();
         $lang_handler = Langs_Languages::getInstance();
+
+        $this->project = Projects_ProjectDao::findByJobId( $this->jid );
 
         try {
             $this->findJobByIdAndPassword();
@@ -186,6 +193,10 @@ class catController extends viewController {
             //stop execution
             return;
         }
+
+        $this->feature_set = new FeatureSet();
+        $this->feature_set->loadFromIdCustomer( $this->project->id_customer ) ;
+        $this->feature_set->loadFromEnvironment();
 
         /*
          * I prefer to use a programmatic approach to the check for the archive date instead of a pure query

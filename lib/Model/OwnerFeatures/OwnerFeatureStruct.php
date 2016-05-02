@@ -15,8 +15,6 @@ class OwnerFeatures_OwnerFeatureStruct extends DataAccess_AbstractDaoSilentStruc
     }
 
     public function classExists() {
-        $name =  "Features\\" . $feature->toClassName() ;
-        return class_exists( $name );
+        return class_exists('\\Features\\' . $this::toClassName() );
     }
-
 }

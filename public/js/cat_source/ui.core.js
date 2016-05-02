@@ -280,7 +280,7 @@ UI = {
             $(segment).removeClass("editor waiting_for_check_result opened");
             $('span.locked.mismatch', segment).removeClass('mismatch');
 
-// close split segment
+            // close split segment
         	$('.sid .actions .split').removeClass('cancel');
         	source = $(segment).find('.source');
         	$(source).removeAttr('style');
@@ -288,7 +288,9 @@ UI = {
         	$('.split-shortcut').html('CTRL + S');
         	$('.splitBar, .splitArea').remove();
         	$('.sid .actions').hide();
-// end split segment
+            // end split segment
+
+
 		return true;
         }
 	},
@@ -319,7 +321,7 @@ UI = {
             if(!alreadyCopied) {
                 this.consecutiveCopySourceNum.push(this.currentSegmentId);
             }
-//        this.consecutiveCopySourceNum++;
+
             if(this.consecutiveCopySourceNum.length > 2) {
                 this.copyAllSources();
             }
@@ -1523,6 +1525,7 @@ UI = {
 			}
 		});
 	},
+
 	setCurrentSegment_success: function(id_segment, d) {
 		if (d.errors.length) {
 			this.processErrors(d.errors, 'setCurrentSegment');

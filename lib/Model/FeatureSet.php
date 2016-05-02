@@ -36,6 +36,26 @@ class FeatureSet {
     }
 
     /**
+     * Here we popuplate the set with plugins imposed by the config file.
+     *
+     */
+    public function loadFromEnvironment() {
+        $features = array() ;
+
+        foreach( INIT::$ENV_DEFINED_PLUGINS as $plugin ) {
+            $featureStruct = new OwnerFeatures_OwnerFeatureStruct(array(
+                'feature_code' => $plugin
+            ));
+
+            if ( $featureStruct->classExists() ) {
+                $features[] = $featureStruct ;
+            }
+        }
+
+        $this->features = array_merge( $this->features, $features );
+    }
+    
+    /**
      * Returns the filtered subject variable passed to all enabled features.
      *
      * @param $method

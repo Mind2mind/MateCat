@@ -327,6 +327,8 @@ class INIT {
 
     public static $PLUGIN_LOAD_PATHS = array();
 
+    public static $ENV_DEFINED_PLUGINS = array();
+
     /**
      * Initialize the Class Instance
      */

@@ -17,12 +17,17 @@ class BaseFeature {
      */
     public function __construct( $feature ) {
         $this->feature = $feature ;
+        
+        $this->afterConstruct();
     }
 
     /**
-     * @param \Klein\Klein $klein
+     * Override if needed.
      *
-     * @return mixed
      */
+
+    protected function afterConstruct() {
+
+    }
 
 }
