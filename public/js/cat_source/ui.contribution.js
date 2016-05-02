@@ -18,9 +18,9 @@ $.extend(UI, {
 		this.editarea.focus();
 		this.highlightEditarea();
 	},
+
 	copySuggestionInEditarea: function(segment, translation, editarea, match, decode, auto, which) {
-// console.log('translation 1: ', translation);
-//        console.log('copySuggestionInEditarea - editarea: ', editarea);
+
 		if (typeof (decode) == "undefined") {
 			decode = false;
 		}
@@ -216,17 +216,15 @@ $.extend(UI, {
         } else {
           suggestion_info = '';
         }
-//                console.log('typeof fieldTest: ', typeof d.data.fieldTest);
+
                 if (typeof d.data.fieldTest == 'undefined') {
                     percentClass = UI.getPercentuageClass(this.match);
                     percentText = this.match;
                 } else {
                     quality = parseInt(this.quality);
-//                    console.log('quality: ', quality);
                     percentClass = (quality > 98)? 'per-green' : (quality == 98)? 'per-red' : 'per-gray';
                     percentText = 'MT';
                 }
-//				cl_suggestion = UI.getPercentuageClass(this.match);
 
 				if (!$('.sub-editor.matches', segment).length) {
 					UI.createFooter(segment);
@@ -243,35 +241,25 @@ $.extend(UI, {
 
                 $('.sub-editor.matches .overflow', segment).append( toAppend );
 
-//				console.log('dopo: ', $('.sub-editor.matches .overflow .suggestion_source', segment).html());
 			});
-            // start addtmxTmp
-//            $('.sub-editor.matches .overflow', segment).append('<div class="addtmx-tr white-tx"><a class="open-popup-addtm-tr">Add your personal TM</a></div>');
-            // end addtmxTmp
-
 
 			UI.setDeleteSuggestion(segment);
 			UI.lockTags();
             UI.setContributionSourceDiff(segment);
 			UI.markSuggestionTags(segment);
 
-//            UI.setContributionSourceDiff_Old();
 			if (editareaLength === 0) {
-//				console.log('translation AA: ', translation);
-//				translation = UI.decodePlaceholdersToText(translation, true, segment_id, 'translation');
 				translation = $('#' + segment_id + ' .matches ul.graysmall').first().find('.translation').html();
-//				console.log($('#' + segment_id + ' .matches .graysmall'));
-//				console.log('translation BB: ', translation);
+
 				UI.copySuggestionInEditarea(segment, translation, editarea, match, false, true, 1);
-				if (UI.body.hasClass('searchActive'))
+
+				if (UI.body.hasClass('searchActive')) {
 					UI.addWarningToSearchDisplay();
+				}
+
 				UI.setChosenSuggestion(1);
 				copySuggestionDone = true;
 			}
-//			if (copySuggestionDone) {
-//				if (isActiveSegment) {
-//				}
-//			}
 
 			$('.translated', segment).removeAttr('disabled');
 			$('.draft', segment).removeAttr('disabled');

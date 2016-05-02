@@ -1148,7 +1148,6 @@ UI = {
 		}
 	},
 	millisecondsToTime: function(milli) {
-//		var milliseconds = milli % 1000;
 		var seconds = Math.round((milli / 1000) % 60);
 		var minutes = Math.floor((milli / (60 * 1000)) % 60);
 		return [minutes, seconds];
@@ -1159,16 +1158,6 @@ UI = {
 	},
 
     placeCaretAtEnd: function(el) {
-//		console.log(el);
-//		console.log($(el).first().get().className);
-//		var range = document.createRange();
-//		var sel = window.getSelection();
-//		range.setStart(el, 1);
-//		range.collapse(true);
-//		sel.removeAllRanges();
-//		sel.addRange(range);
-//		el.focus();
-
 		 $(el).focus();
 		 if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
 			var range = document.createRange();

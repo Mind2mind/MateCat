@@ -772,6 +772,7 @@ $.extend(UI, {
 				}
 				UI.openTagAutocompletePanel();
             }
+
 			if((e.which == 62)&&(UI.taglockEnabled)) { // closing tag sign
 				if($('.tag-autocomplete').length) {
 					e.preventDefault();
@@ -1049,6 +1050,11 @@ $.extend(UI, {
                 } else {
                     UI.lockTags(UI.editarea);
                 }
+
+			$(document).trigger('targetTextChanged', {
+				segment : new UI.Segment( $(e.target).closest('section'))
+			});
+
         }).on('input', '.editor .cc-search .input', function() {
 			UI.markTagsInSearch($(this));
 		}).on('click', '.editor .source .locked,.editor .editarea .locked', function(e) {
