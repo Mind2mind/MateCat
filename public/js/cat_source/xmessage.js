@@ -15,16 +15,18 @@ if (true)
                     $.param( { text : content, locale : config.target_rfc }) ;
 
             $.getJSON( url )
-                .done( function(data) {
-                    var container = segment.el.find('.target.item') ;
-                    container.find('.xmessage-preview').remove();
+            .done( function(data) {
+                if ( data.preview == null ) return ;
 
-                    var element = $('<p/>');
-                    element.addClass('xmessage-preview');
-                    element.text( data.preview );
-                    container.append( element ) ;
+                var container = segment.el.find('.target.item') ;
+                container.find('.xmessage-preview').remove();
 
-                });
+                var element = $('<p/>');
+                element.addClass('xmessage-preview');
+                element.text( data.preview );
+                container.append( element ) ;
+
+            });
         }
     }, 300) ;
 
