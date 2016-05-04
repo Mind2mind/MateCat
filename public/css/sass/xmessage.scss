@@ -1,0 +1,37 @@
+
+section .xmessage-preview {
+  display:none;
+}
+
+section.opened  {
+
+  .xmessage-preview  {
+    display: block;
+    clear: left;
+    float: left;
+    position: relative;
+    margin-top: 0;
+    margin-left: -10px;
+    padding: 2px 0;
+    font-size: 14px;
+    max-width: 200px;
+    text-align: left;
+
+    .xmessage-preview-title {
+      font-weight: bold ;
+    }
+
+    .xmessage-error {
+      color: #cd0a0a;
+    }
+
+  }
+
+  .xmessage-reload-link {
+    color: #0d8fb2;
+  }
+
+  .xmessage-reload-link:hover {
+      color: #002F65;
+  }
+}

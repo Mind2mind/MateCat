@@ -3963,15 +3963,3 @@ section:hover .segment-side-buttons {
     background: #09beec;
 }
 
-
-.xmessage-preview {
-	clear: left;
-	color: #00A8D2;
-	float: left;
-	position: relative;
-	margin-left: -10px;
-	padding: 2px 0;
-	font-size: 14px;
-	max-width: 200px;
-	text-align: left;
-}

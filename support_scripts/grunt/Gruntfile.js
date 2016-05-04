@@ -29,9 +29,7 @@ module.exports = function(grunt) {
         cssBase + 'editlog.css',
         cssBase + 'lib/remodal.css',
         cssBase + 'lib/remodal-default-theme.css',
-        cssBase + 'sass/review_improved.scss',
-        cssBase + 'sass/segment_filter.scss',
-        cssBase + 'sass/cattool.scss',
+        cssBase + 'sass/*.scss',
         cssBase + '../holidays/*.css',
     ];
 
