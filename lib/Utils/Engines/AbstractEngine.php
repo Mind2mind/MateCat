@@ -229,4 +229,7 @@ abstract class Engines_AbstractEngine {
         return $this->engineRecord->name;
     }
 
+    public function getResult() {
+        return $this->result ;
+    }
 }

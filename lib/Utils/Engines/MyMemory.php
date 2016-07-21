@@ -152,6 +152,17 @@ class Engines_MyMemory extends Engines_AbstractEngine implements Engines_EngineI
 
         ( !$_config[ 'isGlossary' ] ? $function = "contribute_relative_url" : $function = "gloss_set_relative_url" );
 
+        if ( $function == 'glossary_import_relative_url' ) {
+            if ( PHP_MINOR_VERSION >= 5 ) {
+                /**
+                 * Added in PHP 5.5.0 with FALSE as the default value.
+                 * PHP 5.6.0 changes the default value to TRUE.
+                 */
+                $options[ CURLOPT_SAFE_UPLOAD ] = false;
+                $this->_setAdditionalCurlParams( $options );
+            }
+        }
+
         $this->call( $function, $parameters );
 
         if ( $this->result->responseStatus != "200" ) {
@@ -253,84 +264,9 @@ class Engines_MyMemory extends Engines_AbstractEngine implements Engines_EngineI
      * @return Engines_Results_MyMemory_TmxResponse
      */
     public function glossaryImport( $file, $key, $name = false ) {
-
-        try {
-
-            $origFile = new SplFileObject( $file, 'r+' );
-            $origFile->setFlags( SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::READ_AHEAD );
-
-            $tmpFileName = tempnam( "/tmp", 'GLOS' );
-            $newFile = new SplFileObject( $tmpFileName, 'r+' );
-            $newFile->setFlags( SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::READ_AHEAD );
-
-            foreach ( $origFile as $line_num => $line ) {
-
-                if( count( $line ) < 2 ){
-                    throw new RuntimeException( "No valid glossary file provided. Field separator could be not valid." );
-                }
-
-                if ( $line_num == 0 ){
-                    list( $source_lang, $target_lang, ) = $line;
-
-                    //eventually, remove BOM from source language
-                    $bom = pack('H*','EFBBBF');
-                    $source_lang = preg_replace("/^$bom/","",$source_lang);
-
-                    if ( !Langs_Languages::getInstance()->isEnabled( $source_lang ) ) {
-                        throw new RuntimeException( "The source language specified in the glossary is not supported: " . $source_lang );
-                    }
-
-                    if ( !Langs_Languages::getInstance()->isEnabled( $target_lang ) ) {
-                        throw new RuntimeException( "The target language specified in the glossary is not supported: " . $target_lang );
-                    }
-
-                    if ( empty( $source_lang ) || empty( $target_lang ) ) {
-                        throw new RuntimeException( "No language definition found in glossary file." );
-                    }
-                    continue;
-                }
-
-                //copy stream to stream
-                $newFile->fputcsv( $line );
-
-            }
-            $newFile->fflush();
-
-            $origFile = null; //close the file handle
-            $newFile = null; //close the file handle
-            copy( $tmpFileName, $file );
-            unlink( $tmpFileName );
-
-        } catch( RuntimeException $e ){
-            $this->result = new Engines_Results_MyMemory_TmxResponse( array(
-                    "responseStatus"  => 406,
-                    "responseData"    => null,
-                    "responseDetails" => $e->getMessage()
-            ) );
-            return $this->result;
-        }
-
-        $postFields = array(
-                'glossary'    => "@" . realpath( $file ),
-                'source_lang' => $source_lang,
-                'target_lang' => $target_lang,
-                'name'        => $name,
-        );
-
-        $postFields[ 'key' ] = trim( $key );
-
-        if ( PHP_MINOR_VERSION >= 5 ) {
-            /**
-             * Added in PHP 5.5.0 with FALSE as the default value.
-             * PHP 5.6.0 changes the default value to TRUE.
-             */
-            $options[ CURLOPT_SAFE_UPLOAD ] = false;
-            $this->_setAdditionalCurlParams( $options );
-        }
-
-        $this->call( "glossary_import_relative_url", $postFields, true );
-
-        return $this->result;
+        $glossaryImport = new Engines_MyMemory_GlossaryImport( $this, $key, $name );
+        $glossaryImport->importGlossary($file);
+        return $glossaryImport->getLastResult();
     }
 
     public function import( $file, $key, $name = false ) {
