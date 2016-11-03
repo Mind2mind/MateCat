@@ -1,0 +1,50 @@
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="/test.js"></script>
+
+    <script type="text/javascript">
+
+  $(document).on('click', '#button1', function() { 
+    console.log('starting'); 
+
+    var t = new Transformer( $('#editarea') ) ; 
+    t.setSearch('text'); 
+
+    t.hlClass('blacklist'); 
+    t.transform(); 
+
+    $('#editarea').focus(); 
+  }); 
+  
+    </script>
+
+    <style type="text/css">
+    
+body { margin: 100px;  font-family: Arial, sans-serif; font-size: 1.2em; } 
+button { margin: 30px 0 ; } 
+
+.editable { 
+  padding: 10px ; 
+    border: 1px solid #c0c0c0; 
+}
+
+.hl { 
+  background-color: gold ; 
+}
+    
+.blacklist { 
+  background-color: gold ; 
+}
+    </style>
+  </head>
+  <body>
+
+    <div id="editarea" class="editable" contenteditable="true" > 
+      this is the <span class="hl">edit area</span> with 
+      <strong>some bold text</strong> some <i>italic text text</i>  text 
+    </div>
+
+    <button id="button1">click here</button>
+  </body>
+</html>
