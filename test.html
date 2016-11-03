@@ -6,16 +6,26 @@
     <script type="text/javascript">
 
   $(document).on('click', '#button1', function() { 
-    console.log('starting'); 
+
+    process () ;
+    $('#editarea').focus();
+  });
+
+function process() {
+  var words = ['text'] ;
+  $.each( words, function() {
 
     var t = new Transformer( $('#editarea') ) ; 
-    t.setSearch('text'); 
+    t.setSearch( this );
 
     t.hlClass('blacklist'); 
     t.transform(); 
 
-    $('#editarea').focus(); 
   }); 
+}
+
+$(document).on('keypress', '#editarea', process);
+
   
     </script>
 
