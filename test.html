@@ -6,25 +6,20 @@
     <script type="text/javascript">
 
   $(document).on('click', '#button1', function() { 
-
     process () ;
     $('#editarea').focus();
   });
 
 function process() {
-  var words = ['text'] ;
-  $.each( words, function() {
+  var words = ['casa', 'text', 'hello'] ;
+  var t = new Transformer( $('#editarea') ) ; 
+  t.setSearch( words ) ; 
 
-    var t = new Transformer( $('#editarea') ) ; 
-    t.setSearch( this );
-
-    t.hlClass('blacklist'); 
-    t.transform(); 
-
-  }); 
+  t.hlClass('blacklist'); 
+  t.transform(); 
 }
 
-$(document).on('keypress', '#editarea', process);
+$(document).on('keyup', '#editarea', process);
 
   
     </script>

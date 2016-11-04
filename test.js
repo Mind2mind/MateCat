@@ -7,7 +7,8 @@
  */
 
 var Transformer = function( element ) { 
-    var term = null; 
+    var terms = null; 
+    var term  = null ; 
     var callback = null; 
     var currentRange = null; 
     var selection = null; 
@@ -22,16 +23,24 @@ var Transformer = function( element ) {
     }
 
     var searchAndReplaceWord = function(node, term) { 
+        // TODO: optimize
+        // IF node matches any of the terms passed as input array and is already wrapped in 
+        // a selector, the don't do anything. 
+        if ( this.terms.indexOf( node.textContent.trim() ) > -1 && $(node).parent().hasClass( this.selector ) ) { 
+            return ; 
+        }
+
+        // Remove any tag with our selector, if any. 
+        if ( $(node).parent().hasClass( this.selector ) ) { 
+            $(node).unwrap();
+        }
+
         var escaped = escapeRegExp( term );
         var expForReplace = new RegExp('\\b(' + escaped + ')\\b',"g");
 
         newText = node.textContent.replace(
             expForReplace , '<span class="' + this.selector + '">$1</span>'
         );
-
-        if ( $(node).parent().hasClass( this.selector ) ) {
-            $(node).unwrap();
-        }
 
         $(node).replaceWith( newText );
     }
@@ -49,25 +58,40 @@ var Transformer = function( element ) {
 
         $(node).replaceWith( newNode );
 
-
         if ( offset ) {
-
-            // TODO: duplicated code
-            var r = document.createRange();
-            r.setStart(newNode[0].childNodes[0], offset);
-            r.setEnd(newNode[0].childNodes[0], offset);
-
-            var sel = window.getSelection();
-
-            sel.removeAllRanges();
-            sel.addRange( r );
+            console.log('calling restoreCursor from transformNodeAndPreserveCursor', term); 
+            restoreCursor( newNode[0].childNodes[0], offset ); 
         }
-
     };
 
-    var removeParentAndPreserveCursor = function() {
+    /** 
+     *
+     */
+    var restoreCursor = function( node, offset ) { 
+
+        if ( $(node).parents('body').length === 0 ) { 
+            console.log('text node removed from tree', node, offset); 
+            return ;
+        }
+        var range = document.createRange();
+        range.setStart( node , offset );
+        range.setEnd( node , offset );
+
+        console.log('restoring position on node', node, offset ); 
+
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange( range );
+    }
+
+    /**
+     * This function finds the node where the cursor is, looks for the parent and 
+     * if the parent is our TAG with selector, then unwrap preserving the cursor 
+     * position. 
+     *
+     */
+    var removeParentAndPreserveCursor = function( term ) {
         var r = window.getSelection().getRangeAt(0);
-        var offset = r.endOffset ;
 
         // TODO: fix this selector
         var parent = $(r.endContainer).parent('.' + this.selector ) ;
@@ -76,17 +100,13 @@ var Transformer = function( element ) {
             return ;
         }
 
+        var savedOffset = r.endOffset ;
         var newNode = document.createTextNode(r.endContainer.textContent);
+
         parent.replaceWith( newNode );
 
-        // TODO: duplicated code
-        var range = document.createRange();
-        range.setStart(newNode, offset);
-        range.setEnd(newNode, offset);
-        var sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-
+        console.log('calling restoreCursor from removeParentAndPreserveCursor', term); 
+        restoreCursor( newNode, savedOffset ); 
         return newNode ;
     }
 
@@ -101,28 +121,42 @@ var Transformer = function( element ) {
             this.currentRange = selection.getRangeAt(0); 
         }
 
-        descend.call( this, this.element, this.term ); 
+        var that = this ; 
+        $.each( this.terms, function(i, term) { 
+            descend.call( that, that.element, term ); 
+        }); 
     };
 
+    /**
+     * We enter in this function when we are sure to be in the same node 
+     * that holds the cursor. 
+     */
     var isolateCursor = function( node, term ) {
         // first off, see if the node is already wrapper and remove the parent
-        var replaced = removeParentAndPreserveCursor.call(this);
+
+        if ( this.terms.indexOf( node.textContent.trim()  ) > -1 && $(node).parent().hasClass( this.selector ) ) { 
+            // don't do anything in this case, already 
+            return ; 
+        } 
+
+        var replaced = removeParentAndPreserveCursor.call(this,term);
+
+        // if ( $(node).parent().hasClass( this.selector ) ) { 
+        //     $(node).unwrap();
+        // }
 
         if ( replaced ) {
-            node = replaced ;
+        node = replaced ;
         }
 
         // then split the text we want to replace stands in its own text node
         var escaped = escapeRegExp( term );
-        var expForSplit = new RegExp('\\b' + escaped + '\\b',"g");
-        var baseNode = node.cloneNode() ;
         var matches =  [];
         var rightPart ; 
         var leftPart ; 
-
         var chunks = []; 
 
-        var that = this ;
+        var expForSplit = new RegExp('\\b' + escaped + '\\b',"g");
         while ((match = expForSplit.exec( node.textContent )) !== null) {
             matches.push( match );
         }
@@ -130,7 +164,6 @@ var Transformer = function( element ) {
         // iterate matches inversely to isolate nodes
         for ( var i = matches.length -1 ; i > -1 ; i--) {
             var match = matches[i] ;
-
 
             if ( node.textContent == term ) {
                 chunks.push( node );
@@ -152,11 +185,14 @@ var Transformer = function( element ) {
         // for each chunk we make a loop and
         chunks.reverse();
 
+        var that = this ;
         $.each(chunks, function(index, node) {
             if ( node.textContent == term ) {
                 transformNodeAndPreserveCursor.call(that, node, term);
             }
         });
+
+
         console.log( chunks ); 
 
         // ok now we splitted nodes 
@@ -174,12 +210,14 @@ var Transformer = function( element ) {
     }
 
     var descend = function(node, term) { 
+        node[0].normalize(); 
+
         node.contents().each( function(index, node) {
             switch( this.nodeType ) {
-              case 3:
+              case 3: // TEXT
                 analyze.call( that, node,  term );
                 break;
-              case 1:
+              case 1: // TAG 
                 descend.call( that, $(node), term );
                 break ;
               default:
@@ -189,7 +227,7 @@ var Transformer = function( element ) {
     }
 
     this.setSearch = function( str ) { 
-        this.term = str ; 
+        this.terms = str ; 
     }
 
     this.setFunction = function( callback ) { 
